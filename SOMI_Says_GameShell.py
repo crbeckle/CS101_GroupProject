@@ -4,6 +4,7 @@ import wave
 import create
 import time
 import random
+import math
 
 def playMusic(mus_str):
 	#define stream chunk   
@@ -39,7 +40,6 @@ def welcome():
 	print "Welcome to SOMI Says!"
 	r.turn(45,50)
 	r.turn(-45,50)
-	#musicPlay(welcome.avi)
 
 def success():
 	r.go(0,-20)
@@ -104,23 +104,37 @@ def bumpNoseFunc():
 			return False
 
 def catchMe():
-        #caution: this function doesn't work yet!
-        time.sleep(4)
-        #playMusic(hit_my_nose.avi)
-        sensors = r.sensors([create.LEFT_BUMP, create.RIGHT_BUMP])
-        end = False
-        timeout = time.clock() + 4
-        while(True):
-                r.go(-50,random()*90-45)
-                tEnd = time.clock() + random()+.2
-                while (time.clock() < tEnd):
-                        if (sensors[create.LEFT_BUMP] == 0 and sensors[create.RIGHT_BUMP] == 0):
-                                exit(0)
-                                return True
-                        if (time.clock() > timeout):
-                                exit(0)
-                                return False
-
+	#caution: this function has not been tested!
+	time.sleep(4)
+	#playMusic(hit_my_nose.avi)
+	sensors = r.sensors([create.LEFT_BUMP, create.RIGHT_BUMP])
+	end = False
+	#set the point in time when somi says the player was too slow
+	timeout = time.clock() + 4
+	while(True):
+		#move in reverse and pick a random turning speed to make it semi-difficult to catch
+		r.go(-50,random()*90-45)
+		#set a point in time when somi will alter its course
+		tEnd = time.clock() + random()+.2
+		while (time.clock() < tEnd):
+			#until it is time to alter somi's course, check if 
+			#the bumper has been hit (win condition) 
+			if (sensors[create.LEFT_BUMP] == 1 or sensors[create.RIGHT_BUMP] == 1):
+				return True
+			#or if somni has timed out (lose condition)
+			if (time.clock() > timeout):
+				return False
+								
+def resetPosition()
+	#Caution - not tested with Somni!
+	#rotate to face toward the start position and then move foward until it is reached
+	#this is so somi is less likely to drift into a corner of the room
+	pose = r.getPose()
+	direction = 360 * atan2(pose[1],pose[0])/(2*math.pi)+180
+	r.turn(direction - pose[2],30)
+	distance = math.sqrt(math.pow(pose[0],2) + math.pow(pose[1],2))
+	r.move(distance,30)
+								
 def main():
 	welcome()
 	while True:
