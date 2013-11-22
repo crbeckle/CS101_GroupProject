@@ -38,16 +38,17 @@ def playMusic(mus_str):
 
 def welcome():
 	print "Welcome to SOMI Says!"
-	r.turn(45,50)
-	r.turn(-45,50)
+	r.turn(45,100)
+	time.sleep(0.2)
+	r.turn(-45,100)
 
 def success():
-	r.go(0,-20)
-	r.playSong([(60,8),(64,8),(67,8),(72,16),(71,8),(72,16)])
-	time.sleep(0.5)
-	r.go(0,20)
-	r.playSong([(60,8),(64,8),(67,8),(72,16),(71,8),(72,16)])
-	time.sleep(0.5)
+	r.go(0,-30)
+	#r.playSong([(60,8),(64,8),(67,8),(72,16),(71,8),(72,16)])
+	time.sleep(0.3)
+	r.go(0,30)
+	#r.playSong([(60,8),(64,8),(67,8),(72,16),(71,8),(72,16)])
+	time.sleep(0.3)
 	playMusic("tada.wav")
 	print "Congratulations, you're not an idiot!"
 
@@ -104,28 +105,40 @@ def bumpNoseFunc():
 			return False
 
 def catchMe():
-	#caution: this function has not been tested!
-	time.sleep(4)
+	time.sleep(2)
 	#playMusic(hit_my_nose.avi)
-	end = False
 	#set the point in time when somi says the player was too slow
-	timeout = time.clock() + 4
-	while(True):
+	counter = 0
+	timeout = time.clock() + 6
+	while (True):
 		#move in reverse and pick a random turning speed to make it semi-difficult to catch
-		r.go(-50,random()*90-45)
+		r.go(-50 + random() * random() * 20,random.random()*180-90)
 		#set a point in time when somi will alter its course
-		tEnd = time.clock() + random()+.2
+		tEnd = time.clock() + random.random() / 2 + .2
 		while (time.clock() < tEnd):
+			r.getPose() # Piazza recommends doing this often to keep information up to date
 			#until it is time to alter somi's course, check if 
-			#the bumper has been hit (win condition) 
+			#the bumper has been hit (increment counter) 
 			sensors = r.sensors([create.LEFT_BUMP, create.RIGHT_BUMP])
 			if (sensors[create.LEFT_BUMP] == 1 or sensors[create.RIGHT_BUMP] == 1):
-				return True
+				r.stop()
+				counter += 1
+				if (counter == 3):
+					# (win condition)
+					time.sleep(2)
+					return True
+				else:
+					# turn randomly, pause, and shoot off in a different direction with a new timer
+					r.turn(random.random() * 360 - 180, 40)
+					time.sleep(2)
+					timeout = time.clock() + 6
 			#or if somi has timed out (lose condition)
 			if (time.clock() > timeout):
+				r.stop()
+				time.sleep(2)
 				return False
 								
-def resetPosition()
+def resetPosition():
 	#Caution - not tested with somi!
 	#rotate to face toward the start position and then move forward until it is reached
 	#this is so somi is less likely to drift into a corner of the room
@@ -138,12 +151,13 @@ def resetPosition()
 def main():
 	welcome()
 	while True:
-		shuffle(commands)
+		random.shuffle(commands)
 		for test in commands:
 			if test():
 				success()
 			else:
 				failure()
+			r.stop()
 		if proceed():
 			continue
 		else:
@@ -151,5 +165,5 @@ def main():
 			break
 	
 r = create.Create(3)
-commands = [bumpNoseFunc]
+commands = [catchMe]
 main()
