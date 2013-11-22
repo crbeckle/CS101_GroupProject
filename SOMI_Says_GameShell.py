@@ -53,7 +53,7 @@ def success():
 
 def failure():
 	playMusic("EpicFailVoice.wav")
-	print "You ought to be ashamed of yourself!"
+	print "You have displeased the machine spirit and forfeited your immortal soul to the darkness!"
 	
 def waiting():
 	r.go(0,-20)
