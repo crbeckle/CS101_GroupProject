@@ -107,7 +107,6 @@ def catchMe():
 	#caution: this function has not been tested!
 	time.sleep(4)
 	#playMusic(hit_my_nose.avi)
-	sensors = r.sensors([create.LEFT_BUMP, create.RIGHT_BUMP])
 	end = False
 	#set the point in time when somi says the player was too slow
 	timeout = time.clock() + 4
@@ -119,15 +118,16 @@ def catchMe():
 		while (time.clock() < tEnd):
 			#until it is time to alter somi's course, check if 
 			#the bumper has been hit (win condition) 
+			sensors = r.sensors([create.LEFT_BUMP, create.RIGHT_BUMP])
 			if (sensors[create.LEFT_BUMP] == 1 or sensors[create.RIGHT_BUMP] == 1):
 				return True
-			#or if somni has timed out (lose condition)
+			#or if somi has timed out (lose condition)
 			if (time.clock() > timeout):
 				return False
 								
 def resetPosition()
-	#Caution - not tested with Somni!
-	#rotate to face toward the start position and then move foward until it is reached
+	#Caution - not tested with somi!
+	#rotate to face toward the start position and then move forward until it is reached
 	#this is so somi is less likely to drift into a corner of the room
 	pose = r.getPose()
 	direction = 360 * atan2(pose[1],pose[0])/(2*math.pi)+180
