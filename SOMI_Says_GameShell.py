@@ -250,7 +250,7 @@ def catchMe():
 	timeout = time.clock() + 6
 	while (True):
 		#move in reverse and pick a random turning speed to make it semi-difficult to catch
-		r.go(-50 + random() * random() * 20,random.random()*180-90)
+		r.go(-50 + random.random() * random.random() * 20,random.random()*180-90)
 		#set a point in time when somi will alter its course
 		tEnd = time.clock() + random.random() / 2 + .2
 		while (time.clock() < tEnd):
@@ -264,27 +264,35 @@ def catchMe():
 				if (counter == 3):
 					# (win condition)
 					time.sleep(2)
+					#resetPosition()
+					#time.sleep(2)
 					return True
 				else:
 					# turn randomly, pause, and shoot off in a different direction with a new timer
-					r.turn(random.random() * 360 - 180, 40)
+					if (random.random() < 0.5):
+                                                r.turn(int(random.random() * 180) , 40)
+                                        else:
+                                                r.turn(-int(random.random() * 180) , -40)
 					time.sleep(2)
 					timeout = time.clock() + 6
 			#or if somi has timed out (lose condition)
 			if (time.clock() > timeout):
 				r.stop()
 				time.sleep(2)
+				#resetPosition()
+				#time.sleep(2)
 				return False
 								
 def resetPosition():
-	#Caution - not tested with somi!
+	#Note: pose data is extremely unreliable! Do not trust!
 	#rotate to face toward the start position and then move forward until it is reached
 	#this is so somi is less likely to drift into a corner of the room
 	pose = r.getPose()
-	direction = 360 * atan2(pose[1],pose[0])/(2*math.pi)+180
-	r.turn(direction - pose[2],30)
+	print pose
+	direction = 360 * math.atan2(pose[1],pose[0])/(2*math.pi)+180
+	r.turn(int(direction - pose[2]) % 360, 30)
 	distance = math.sqrt(math.pow(pose[0],2) + math.pow(pose[1],2))
-	r.move(distance,30)
+	r.move(int(distance),30)
 								
 def main():
 	welcome()
