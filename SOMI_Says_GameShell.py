@@ -251,18 +251,25 @@ def highFive():
 		else:
 			if (not sensors[create.RIGHT_BUMP] == 1 and not sensors[create.LEFT_BUMP] == 1):
 				# Sensors were triggered 0.2 seconds ago but no longer register, must've been a fluke
-				triggered = False
-			elif ((part == "left hand" and sensors[create.RIGHT_BUMP] == 1 and sensors[create.LEFT_BUMP] == 0) or
-				(part == "right hand" and sensors[create.RIGHT_BUMP] == 0 and sensors[create.LEFT_BUMP] == 1) or
-				(part == "nose" and sensors[create.RIGHT_BUMP] == 1 and sensors[create.LEFT_BUMP] == 1)):
-				# Correct sensors pressed! Good job!
-				return True
+				triggered = False	
 			else:
-				# Wrong sensors pressed! Try again
-				print("Sorry, you didn't press my %s! Please try again!" % part)
-				tries_left -= 1
-				time.sleep(0.5)
-				timeout = time.clock() + 10
+				pressed = ""
+				if (sensors[create.RIGHT_BUMP] == 1 and sensors[create.LEFT_BUMP] == 0):
+					pressed = "left hand"
+				if (sensors[create.RIGHT_BUMP] == 0 and sensors[create.LEFT_BUMP] == 1):
+					pressed = "right hand"
+				if (sensors[create.RIGHT_BUMP] == 1 and sensors[create.LEFT_BUMP] == 1):
+					pressed = "nose"
+				
+				if (part == pressed):
+					# Correct sensors pressed! Good job!
+					return True
+				else:
+					# Wrong sensors pressed! Try again
+					print("Sorry, that was my %s! Try again!" % pressed)
+					tries_left -= 1
+					time.sleep(0.5)
+					timeout = time.clock() + 10
 
 def catchMe():
 	time.sleep(2)
